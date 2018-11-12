@@ -19,17 +19,51 @@
         </div>
 
         <div class="comment">
+            <p>评论列表</p>
+            <ul class="list-group">
+                {% for comment in comment_list %}
+                    <li class="list-group-item">
+                        <div><a href="">
+                            {{ forloop.counter }}楼</a> &nbsp;&nbsp;
+                            <span>{{ comment.create_time|date:"Y-m-d H:i" }}</span>&nbsp;&nbsp;
+                            <a href=""><span>{{ comment.user.username }}</span></a>
+                            <a href="" class="pull-right">回复</a>
+                        </div>
+                    <p class="comment_con">{{ comment.content }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+
             <p>发表评论</p>
             <p>
                 昵称：<input type="text" id="tbCommentAuthor" class="author" disabled="disabled" size="50"
                           value="{{ request.user.username }}">
             </p>
             <p>评论内容：</p>
-            <p><textarea name="" id="" cols="30" rows="10"></textarea></p>
+            <p><textarea name="" id="comment_content" cols="30" rows="10"></textarea></p>
             <button class="btn btn-default comment_btn">提交评论</button>
         </div>
     </div>
     <script>
+        $('.comment_btn').click(function () {
+            var pid = "";
+            var content = $('#comment_content').val();
+            $.ajax({
+                url: '/comment/',
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+                    'article_id': '{{ article_obj.pk }}',
+                    'content': content,
+                    'pid': pid,
+
+                },
+                success: function (data) {
+                    console.log(data)
+                    $('#comment_content').val("");
+                }
+            })
+        });
         $('#div_digg .action').click(function () {
             var is_up = $(this).hasClass('diggit');
             obj = $(this).children('span');

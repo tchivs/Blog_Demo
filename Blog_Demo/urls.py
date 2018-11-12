@@ -27,6 +27,7 @@ urlpatterns = [
     path('register/', views.register),
     path('index/', views.index),
     path('digg/', views.digg),
+    path('comment/', views.comment),
     path('ajax_validate/', views.ajax_validate),
     path('get_validCode_img/', views.get_validCode_img),
     url(r'^pc-geetest/register', views.pcgetcaptcha, name='pcgetcaptcha'),

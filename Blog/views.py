@@ -157,7 +157,7 @@ def article_detail(request, username, article_id):
     user = UserInfo.objects.filter(username=username).first()
     blog = user.blog
     article_obj = models.Article.objects.filter(pk=article_id).get()
-
+    comment_list = models.Comment.objects.filter(article_id=article_id)
     return render(request, 'article_detail.html', locals())
 
 
@@ -186,3 +186,13 @@ def digg(request):
 
         return JsonResponse(response)
     return render(request, 'not_found.html')
+
+
+def comment(request):
+    print(request.POST)
+    article_id = request.POST.get('article_id')
+    content = request.POST.get('content')
+    pid = request.POST.get('pid')
+    comment_obj = models.Comment.objects.create(user_id=request.user.pk, article_id=article_id, content=content,
+                                                parent_comment_id=pid)
+    return HttpResponse('comment')
