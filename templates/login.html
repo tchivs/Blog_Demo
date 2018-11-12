@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/blog/bs/css/bootstrap.min.css">
+    <title>登陆</title>
+</head>
+<body>
+<h3>登陆页面</h3>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-lg-offset-3">
+            <form>
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="user">用户名</label>
+                    <input type="text" id="user" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="pwd">密码</label>
+                    <input type="password" id="pwd" class="form-control">
+                </div>
+                <input type="button" class="btn btn-default login_btn" value="submit"><span class="error"></span>
+                <a href="/register/" class="btn btn-success pull-right">注册</a>
+                <div id="popup-captcha"></div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/static/js/jquery-3.2.1.min.js"></script>
+<!-- 引入封装了failback的接口--initGeetest -->
+<script src="http://static.geetest.com/static/tools/gt.js"></script>
+<script>
+    //刷新验证码
+    $('#valid_code_img').click(function () {
+        $(this)[0].src += "?"
+    });
+    //输入框的enter事件
+    $("input").bind('keydown', function (event) {
+        if (event.keyCode === "13") {
+            console.log('enter');
+            $('.login_btn').click()
+        }
+    });
+    //登陆验证
+    $('.login_btnxx').click(function (e) {
+        $.ajax({
+            url: '/pcajax_validate',
+            type: 'post',
+            data: {
+                user: $('#user').val(),
+                pwd: $('#pwd').val(),
+                valid_code: $('#valid_code').val(),
+                csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
+            },
+            success: function (data) {
+                if (data.user) {
+                    location.href = '/index/'
+                } else {
+                    $('.error').text(data.msg).css({'color': 'red', 'margin-left': '10px'})
+                    setTimeout(function () {
+                        $('.error').text('');
+                    }, 1000)
+                }
+                console.log(data)
+            }
+        })
+    });
+
+    var handlerPopup = function (captchaObj) {
+        // 成功的回调
+        captchaObj.onSuccess(function () {
+            var validate = captchaObj.getValidate();
+            $.ajax({
+                url: "", // 进行二次验证
+                type: "post",
+                dataType: "json",
+                data: {
+                    user: $('#user').val(),
+                    pwd: $('#pwd').val(),
+                    geetest_challenge: validate.geetest_challenge,
+                    geetest_validate: validate.geetest_validate,
+                    geetest_seccode: validate.geetest_seccode,
+                    csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
+                },
+                success: function (data) {
+                    if (data.user) {
+                        location.href = '/index/'
+                    } else {
+                        $('.error').text(data.msg).css({'color': 'red', 'margin-left': '10px'});
+                        setTimeout(function () {
+                            $('.error').text('');
+                        }, 5000)
+                    }
+                    {#console.log(data);#}
+                }
+            });
+        });
+        $(".login_btn").click(function () {
+            captchaObj.show();
+        });
+        // 将验证码加到id为captcha的元素里
+        captchaObj.appendTo("#popup-captcha");
+    };
+    // 验证开始需要向网站主后台获取id，challenge，success（是否启用failback）
+    $.ajax({
+        url: "/pc-geetest/register?t=" + (new Date()).getTime(), // 加随机数防止缓存
+        type: "get",
+        dataType: "json",
+        success: function (data) {
+            // 使用initGeetest接口
+            // 参数1：配置参数
+            // 参数2：回调，回调的第一个参数验证码对象，之后可以使用它做appendTo之类的事件
+            initGeetest({
+                gt: data.gt,
+                challenge: data.challenge,
+                product: "popup", // 产品形式，包括：float，embed，popup。注意只对PC版验证码有效
+                offline: !data.success // 表示用户后台检测极验服务器是否宕机，一般不需要关注
+                // 更多配置参数请参见：http://www.geetest.com/install/sections/idx-client-sdk.html#config
+            }, handlerPopup);
+        }
+    });
+</script>
+</body>
+</html>

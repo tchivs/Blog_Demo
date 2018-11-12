@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/blog/bs/css/bootstrap.min.css">
+    <style>
+        #avatar_img {
+            margin-left: 20px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+    <title>注册</title>
+</head>
+<body>
+<h3>注册页面</h3>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-lg-offset-3">
+            <form class="form">
+                {% csrf_token %}
+
+
+                {% for filed in form %}
+                    <div class="form-group">
+                        <label for="{{ filed.auto_id }}">{{ filed.label }}</label>
+
+
+                        {{ filed }}<span class="error pull-right"></span>
+                    </div>
+                {% endfor %}
+                <div class="form-group avatar">
+                    <label for="avatar">头像
+                        <img id="avatar_img" src="/static/blog/img/default.png" alt="">
+                    </label>
+
+                    <input type="file" id="avatar" class="hidden" onchange="xmTanUploadImg(this)">
+                </div>
+                <input type="button" class="btn btn-default reg_btn" value="submit"><span class="error"></span>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/static/js/jquery-3.2.1.min.js"></script>
+
+<script>
+    //选择图片，马上预览
+    function xmTanUploadImg(obj) {
+        //获取用户选中的文件对象
+        var file = obj.files[0];
+        console.log(obj);
+        console.log(file);
+        console.log("file.size = " + file.size);  //file.size 单位为byte
+
+        var reader = new FileReader();
+
+        //读取文件过程方法
+        reader.onloadstart = function (e) {
+            console.log("开始读取....");
+        };
+        reader.onprogress = function (e) {
+            console.log("正在读取中....");
+        };
+        reader.onabort = function (e) {
+            console.log("中断读取....");
+        };
+        reader.onerror = function (e) {
+            console.log("读取异常....");
+        };
+        reader.onload = function (e) {
+            console.log("成功读取....");
+
+            var img = document.getElementById("avatar_img");
+            img.src = e.target.result;
+            //或者 img.src = this.result;  //e.target == this
+        };
+
+        reader.readAsDataURL(file)
+    }
+
+    //输入框的enter事件
+    $("input[type='text']").bind('keydown', function (event) {
+        if (event.keyCode === "13") {
+            $('.login_btn').click()
+        }
+    });
+    $(function () {
+        //判断浏览器是否支持FileReader接口
+        if (typeof FileReader == 'undefined') {
+            document.getElementsByClassName("avatar")[0].InnerHTML = "<h1>当前浏览器不支持FileReader接口</h1>";
+            //使选择控件不可操作
+            document.getElementById("avatar").setAttribute("disabled", "disabled");
+        }
+
+
+        $('.reg_btn').click(function () {
+            {#用form data发送数据#}
+            var form = new FormData();
+            var request_data = $('.form').serializeArray();
+            console.log(request_data);
+            $.each(request_data, function (index, data) {
+                form.append(data.name, data.value)
+            });
+
+            {#form.append("user", $('#id_user').val());#}
+            {#form.append("pwd", $('#id_pwd').val());#}
+            {#form.append("re_pwd", $('#id_re_pwd').val());#}
+            {#form.append("email", $('#id_email').val());#}
+            {#form.append("csrfmiddlewaretoken", $("input[name='csrfmiddlewaretoken']").val());#}
+
+            form.append("avatar", $('#avatar')[0].files[0]);
+            $.ajax({
+                url: '',
+                type: 'post',
+                contentType: false,
+                processData: false,
+                data: form,
+                success: function (data) {
+                    console.log(data);
+                    if (data.user) {//注册成功
+                        location.href='/login/'
+                    } else {
+                        $('span.error').html('');//清空错误信息
+                        $('.form-group').removeClass('has-error');
+                        $.each(data.msg, function (field, error_list) {//显示当前提交的错误信息
+                            if (field == '__all__') {
+                                $('#id_re_pwd').next().html(error_list[0]).parent().addClass('has-error');
+                            }
+                            $('#id_' + field).next().html(error_list[0]);
+                            $('#id_' + field).parent().addClass('has-error');
+                        });
+                    }
+                }
+            })
+        });
+
+
+    })
+
+
+</script>
+</body>
+</html>
