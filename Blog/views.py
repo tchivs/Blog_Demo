@@ -195,4 +195,17 @@ def comment(request):
     pid = request.POST.get('pid')
     comment_obj = models.Comment.objects.create(user_id=request.user.pk, article_id=article_id, content=content,
                                                 parent_comment_id=pid)
-    return HttpResponse('comment')
+    response = {}
+
+    response["create_time"] = comment_obj.create_time.strftime("%Y-%m-%d %X")
+    response["username"] = request.user.username
+    response["content"] = content
+    response["parent_comment_id"] = comment_obj.parent_comment_id
+    return JsonResponse(response)
+
+
+def get_comment_tree(request):
+    print(request.GET)
+    article_id = request.GET.get('article_id')
+    ret = list(models.Comment.objects.filter(article_id=article_id).values('pk', 'content', 'parent_comment_id'))
+    return JsonResponse(ret, safe=False)
