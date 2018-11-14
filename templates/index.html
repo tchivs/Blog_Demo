@@ -103,7 +103,7 @@
             <div id="article_list">
                 {% for article in article_list %}
                     <div class="article_item">
-                        <h5><a href="">{{ article.title }}</a></h5>
+                        <h5><a href="/{{ article.user.username }}/articles/{{ article.pk }}">{{ article.title }}</a></h5>
                         <div class="article_desc">
                             <span class="media-left">
                             <a href=""><img width="56" height="56" src="/media/{{ article.user.avatar }}" alt=""></a>

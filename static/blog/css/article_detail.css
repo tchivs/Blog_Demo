@@ -59,3 +59,6 @@ input.author{
 .clear{
     clear:both;
 }
+.comment_item{
+    margin-left: 20px;
+}

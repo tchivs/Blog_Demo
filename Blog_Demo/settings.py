@@ -123,3 +123,13 @@ STATICFILES_DIRS = [
 # media配置
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# 发送邮件配置
+EMAIL_HOST = ""
+EMAIL_PORT = 465
+EMAIL_HOST_USER = ""
+EMAIL_HOST_PASSWORD = ""
+EMAIL_USE_SSL = True
+
+# 用户认证组件跳转页面
+LOGIN_URL = '/login/'

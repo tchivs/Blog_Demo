@@ -20,6 +20,7 @@
         <div class="tree_btn">
             评论树
         </div>
+        <div class="comment_tree"></div>
         <div class="comment">
             <p>评论列表</p>
             <ul class="list-group">
@@ -44,7 +45,6 @@
                     </li>
                 {% endfor %}
             </ul>
-
             <p>发表评论</p>
             <p>
                 昵称：<input type="text" id="tbCommentAuthor" class="author" disabled="disabled" size="50"
@@ -59,23 +59,30 @@
 
         var pid = "";
 
-        $('.tree_btn').click(function () {
             $.ajax({
                 url: '/get_comment_tree/',
                 type: 'get',
                 data: {
                     article_id: "{{ article_obj.pk }}"
                 },
-                success: function (data) {
-                    $.each(data, function (index, content_obj) {
+                success: function (comment_list) {
+                    console.log(comment_list);
+
+                    $.each(comment_list, function (index, content_obj) {
+                        console.log(content_obj);
                         var pk = content_obj.pk;
                         var content = content_obj.content;
                         var parent_comment_id = content_obj.parent_comment_id;
+                        var s = `<div class="comment_item" comment_id="${pk}"><span>${content}</span></div>`
+                        if (!parent_comment_id) {
+                            $('.comment_tree').append(s);
+                        } else {
+                            $(`[comment_id=${parent_comment_id}]`).append(s);
+                        }
                     });
-                    console.log(data)
                 }
             })
-        })
+
         $('.comment_btn').click(function () {
 
             var content = $('#comment_content').val();

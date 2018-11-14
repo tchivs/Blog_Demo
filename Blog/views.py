@@ -1,8 +1,10 @@
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Avg, Max, Min
 from django.db.models.functions import TruncMonth
 from django.shortcuts import render, redirect, HttpResponse
 from django.http.response import JsonResponse
 from django.contrib import auth
+from django.db import transaction
 from Blog.models import UserInfo
 from Blog.utils.Myforms import UserForm
 from .utils.geetest import GeetestLib
@@ -193,19 +195,41 @@ def comment(request):
     article_id = request.POST.get('article_id')
     content = request.POST.get('content')
     pid = request.POST.get('pid')
-    comment_obj = models.Comment.objects.create(user_id=request.user.pk, article_id=article_id, content=content,
-                                                parent_comment_id=pid)
+    # 事务操作，同进同退
+    with transaction.atomic():
+        comment_obj = models.Comment.objects.create(user_id=request.user.pk, article_id=article_id, content=content,
+                                                    parent_comment_id=pid)
+        models.Article.objects.filter(pk=article_id).update(comment_count=F('comment_count') + 1)
     response = {}
 
     response["create_time"] = comment_obj.create_time.strftime("%Y-%m-%d %X")
     response["username"] = request.user.username
     response["content"] = content
     response["parent_comment_id"] = comment_obj.parent_comment_id
+
+    article_obj = models.Article.objects.filter(article_id=article_id).first()
+    # 发送邮件
+    from django.core.mail import send_mail
+    from Blog_Demo import settings
+
+    import threading
+    t = threading.Thread(target=send_mail, args=("您的文章%s新增了一条评论内容" % article_obj.title,
+                                                 content,
+                                                 settings.EMAIL_HOST_USER,
+                                                 [article_obj.user.email]))
+    t.start()
     return JsonResponse(response)
 
 
 def get_comment_tree(request):
     print(request.GET)
     article_id = request.GET.get('article_id')
-    ret = list(models.Comment.objects.filter(article_id=article_id).values('pk', 'content', 'parent_comment_id'))
+    ret = list(models.Comment.objects.filter(article_id=article_id).order_by('pk').values('pk', 'content',
+                                                                                          'parent_comment_id'))
     return JsonResponse(ret, safe=False)
+
+
+@login_required
+def cn_backend(request):
+    article_list = models.Article.objects.filter(user=request.user)
+    return render(request, "backend/backend.html", locals())

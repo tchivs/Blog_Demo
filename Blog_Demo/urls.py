@@ -26,8 +26,13 @@ urlpatterns = [
     path('logout/', views.logout),
     path('register/', views.register),
     path('index/', views.index),
+    # 后台管理url
+    re_path('cn_backend/$',views.cn_backend),
+    # 点赞
     path('digg/', views.digg),
+    # 评论
     path('comment/', views.comment),
+    # 获取评论树相关数据
     path('get_comment_tree/', views.get_comment_tree),
     path('ajax_validate/', views.ajax_validate),
     path('get_validCode_img/', views.get_validCode_img),
