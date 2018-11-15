@@ -40,7 +40,7 @@
     });
     //输入框的enter事件
     $("input").bind('keydown', function (event) {
-        if (event.keyCode === "13") {
+        if (event.keyCode == 13) {
             console.log('enter');
             $('.login_btn').click()
         }
@@ -88,7 +88,13 @@
                 },
                 success: function (data) {
                     if (data.user) {
-                        location.href = '/index/'
+                        if (data.href) {
+                            location.href = data.href
+
+                        } else {
+                            location.href = '/index/'
+
+                        }
                     } else {
                         $('.error').text(data.msg).css({'color': 'red', 'margin-left': '10px'});
                         setTimeout(function () {

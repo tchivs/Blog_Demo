@@ -36,6 +36,7 @@ def login(request):
             if user:
                 auth.login(request, user)  # request.user==当前登陆对象
                 result['user'] = user.username
+                result['url'] = request.GET.get('next')
             else:
                 result['msg'] = 'username or password error!'
         return JsonResponse(result)
@@ -235,6 +236,7 @@ def cn_backend(request):
     return render(request, "backend/backend.html", locals())
 
 
+@login_required
 def cn_backend_add(request):
     if request.is_ajax():
         print(request.POST)

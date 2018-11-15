@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "backend/base.html" %}
 {% block link %}
     <link rel="stylesheet" href="/static/blog/css/add.css">
 {% endblock %}
@@ -11,15 +11,22 @@
                 <input type="text" id="title" class="form-control">
             </div>
             <div class="form-group">
-                <label for="content">内容</label>
-                <textarea id="content" class="form-control"></textarea>
+                <label for="article_content">内容</label>
+                <textarea id="article_content" class="form-control" name="content" style="height:300px;">
+
+                </textarea>
             </div>
             <input type="button" value="返回" class="btn btn-default pull-right" id="back">
             <input type="button" value="提交" class="btn btn-info pull-right" id="push">
 
         </form>
     </div>
+    <script charset="utf-8" src=/static/blog/kindeditor/kindeditor-all-min.js></script>
+<script charset="utf-8" src="/static/blog/kindeditor/lang/zh-CN.js"></script>
     <script>
+            KindEditor.ready(function(K) {
+                window.editor = K.create('#article_content');
+        });
         $('#back').click(function () {
             location.href = '/cn_backend';
         });
