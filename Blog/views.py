@@ -233,3 +233,14 @@ def get_comment_tree(request):
 def cn_backend(request):
     article_list = models.Article.objects.filter(user=request.user)
     return render(request, "backend/backend.html", locals())
+
+
+def cn_backend_add(request):
+    if request.is_ajax():
+        print(request.POST)
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        models.Article.objects.create(user=request.user, title=title, content=content)
+        ret = {'msg': True}
+        return JsonResponse(ret)
+    return render(request, "backend/add.html", locals())

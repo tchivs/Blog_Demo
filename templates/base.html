@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="/static/blog/bs/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/blog/css/article_detail.css">
     <link rel="stylesheet" href="/static/blog/css/home_site.css">
+    {% block link %}
+
+    {% endblock %}
     <style>
         .mynavbar {
             position: relative;
@@ -64,7 +67,7 @@
                     <h3 class="panel-title">操作</h3>
                 </div>
                 <div class="panel-body">
-                    <a href="">添加文章</a>
+                    <a href="/cn_backend/add">添加文章</a>
                 </div>
             </div>
         </div>

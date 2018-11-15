@@ -27,7 +27,8 @@ urlpatterns = [
     path('register/', views.register),
     path('index/', views.index),
     # 后台管理url
-    re_path('cn_backend/$',views.cn_backend),
+    re_path('cn_backend$',views.cn_backend),
+    re_path('cn_backend/add$',views.cn_backend_add),
     # 点赞
     path('digg/', views.digg),
     # 评论
