@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Avg, Max, Min
 from django.db.models.functions import TruncMonth
@@ -9,6 +11,7 @@ from Blog.models import UserInfo
 from Blog.utils.Myforms import UserForm
 from .utils.geetest import GeetestLib
 from Blog import models
+from Blog_Demo import settings
 
 pc_geetest_id = "b46d1900d0a894591916ea94ea91bd2c"
 pc_geetest_key = "36fc3fe98530eea08dfc6ce76e3d24c4"
@@ -246,3 +249,14 @@ def cn_backend_add(request):
         ret = {'msg': True}
         return JsonResponse(ret)
     return render(request, "backend/add.html", locals())
+
+
+def upload(request):
+    print(request.FILES)
+    img = request.FILES.get('upload_img')
+    path = os.path.join(settings.MEDIA_ROOT, 'add_article_img', img.name)
+    with open(path, 'wb') as f:
+        for line in img:
+            f.write(line)
+
+    return HttpResponse('OK')

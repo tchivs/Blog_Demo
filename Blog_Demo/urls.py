@@ -26,6 +26,7 @@ urlpatterns = [
     path('logout/', views.logout),
     path('register/', views.register),
     path('index/', views.index),
+    path('upload/', views.upload),
     # 后台管理url
     re_path('cn_backend$',views.cn_backend),
     re_path('cn_backend/add$',views.cn_backend_add),

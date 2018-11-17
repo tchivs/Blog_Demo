@@ -12,9 +12,10 @@
             </div>
             <div class="form-group">
                 <label for="article_content">内容</label>
-                <textarea id="article_content" class="form-control" name="content" style="height:300px;">
+                <textarea id="article_content" class="form-control" name="content">
 
                 </textarea>
+
             </div>
             <input type="button" value="返回" class="btn btn-default pull-right" id="back">
             <input type="button" value="提交" class="btn btn-info pull-right" id="push">
@@ -25,7 +26,13 @@
 <script charset="utf-8" src="/static/blog/kindeditor/lang/zh-CN.js"></script>
     <script>
             KindEditor.ready(function(K) {
-                window.editor = K.create('#article_content');
+                window.editor = K.create('#article_content',{
+                    height:"600",
+                    resizeType:0,
+                    uploadJson:"/upload/",
+                    extraFileUploadParams:{csrfmiddlewaretoken:$("input[name='csrfmiddlewaretoken']").val()},
+                    filePostName:"upload_img"
+                });
         });
         $('#back').click(function () {
             location.href = '/cn_backend';
