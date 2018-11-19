@@ -124,7 +124,7 @@
         });
         $('#div_digg .action').click(function () {
             var is_up = $(this).hasClass('diggit');
-            obj = $(this).children('span');
+            var obj = $(this).children('span');
             $.ajax({
                 url: '/digg/',
                 type: 'POST',
@@ -137,8 +137,8 @@
                 success: function (data) {
                     console.log(data);
                     if (data.state) {
-                        var val = parseInt($obj.text());
-                        $obj.text(val + 1);
+                        var val = parseInt(obj.text());
+                        obj.text(val + 1);
 
                     }
                     else {

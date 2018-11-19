@@ -1,5 +1,6 @@
 import os
 
+from bs4 import BeautifulSoup
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Avg, Max, Min
 from django.db.models.functions import TruncMonth
@@ -211,17 +212,17 @@ def comment(request):
     response["content"] = content
     response["parent_comment_id"] = comment_obj.parent_comment_id
 
-    article_obj = models.Article.objects.filter(article_id=article_id).first()
-    # 发送邮件
-    from django.core.mail import send_mail
-    from Blog_Demo import settings
-
-    import threading
-    t = threading.Thread(target=send_mail, args=("您的文章%s新增了一条评论内容" % article_obj.title,
-                                                 content,
-                                                 settings.EMAIL_HOST_USER,
-                                                 [article_obj.user.email]))
-    t.start()
+    # article_obj = models.Article.objects.filter(article_id=article_id).first()
+    # # 发送邮件
+    # from django.core.mail import send_mail
+    # from Blog_Demo import settings
+    #
+    # import threading
+    # t = threading.Thread(target=send_mail, args=("您的文章%s新增了一条评论内容" % article_obj.title,
+    #                                              content,
+    #                                              settings.EMAIL_HOST_USER,
+    #                                              [article_obj.user.email]))
+    # t.start()
     return JsonResponse(response)
 
 
@@ -245,7 +246,13 @@ def cn_backend_add(request):
         print(request.POST)
         title = request.POST.get('title')
         content = request.POST.get('content')
-        models.Article.objects.create(user=request.user, title=title, content=content)
+        soup = BeautifulSoup(content, 'html.parser')
+        # 过滤非法标签
+        for tag in soup.find_all():
+            if tag.name == 'script':
+                soup.decompose()
+        desc = soup.text[0:150]
+        models.Article.objects.create(user=request.user, title=title, content=str(soup), desc=desc)
         ret = {'msg': True}
         return JsonResponse(ret)
     return render(request, "backend/add.html", locals())
@@ -258,5 +265,5 @@ def upload(request):
     with open(path, 'wb') as f:
         for line in img:
             f.write(line)
-
-    return HttpResponse('OK')
+    response = {'error': 0, 'url': '/media/add_article_img/' + img.name}
+    return JsonResponse(response)

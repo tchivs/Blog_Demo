@@ -43,11 +43,11 @@
                 type: "post",
                 data: {
                     title: $('#title').val(),
-                    content: $('#content').val(),
+                    content: editor.html(),
                     csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
                 },
                 success: function (data) {
-                    console.log(data)
+                    location.href='/cn_backend';
                 }
             })
         })

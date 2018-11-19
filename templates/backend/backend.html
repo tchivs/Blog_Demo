@@ -5,7 +5,7 @@
                         <div class="article_item clearfix">
                             <h5><a href="/{{ article.user.username }}/articles/{{ article.pk }}">{{ article.title }}</a></h5>
                             <div class="article_desc">
-                                {{ article.desc }}
+                                {{ article.desc |safe }}
                             </div>
                             <div class="small pub_info pull-right">
                                 <span>发布于&nbsp;&nbsp;{{ article.create_time|date:"Y-m-d H:i" }}</span>&nbsp;&nbsp;&nbsp;
